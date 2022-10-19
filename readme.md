@@ -10,6 +10,10 @@
 
 [toc]
 
+阅读时可以参考 [RFC5681 中文机翻 (rfc2cn.com)](https://rfc2cn.com/rfc5681.html )。
+
+以及 RFC5681 原文 [RFC5681-ZH/RFC5681.pdf](https://github.com/GGN-2015/RFC5681-ZH/blob/main/rfc5681.txt.pdf)。
+
 ## 摘要
 
 本文定义了 TCP 所采用的四种相互关联的拥塞控制算法：慢启动(slow start)，拥塞避免(congestion avoidance)，快速重传(fast retransmit) 以及快速恢复(fast recovery)。除此之外，本文还详细地阐述了 TCP 在经历了一段较长时间的闲置(idle) 后应如何再次启动数据传输，同时讨论多种确认生成方法(acknowledgment generation methods)。本篇 RFC 的提出，废除了 RFC 2581。
