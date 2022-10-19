@@ -132,7 +132,7 @@ BCP 78 以及 IETF Trust 关于 IETF 文档的法律条款对本文的约束力�
 
 **重复确认**(DUPLICATE ACKNOWLEDGMENT)：一个确认消息(acknowledgment)被认为是“**重复的**”("duplicate")当且仅当下述五个条件全部满足：
 
-(a) 对于这个确认消息(ACK) 的接收端而言，网络中存在正在向他传输且尚未确认的数据；
+(a) 对于发出这个确认消息(ACK) 的接收端而言（译者注：ACK 由接收端向发送端发送），网络中存在正在向他传输且尚未被他确认的数据；
 
 > 译者注：我们将  outstanding data 翻译为了 “正在传输且尚未确认的数据”，原文为：
 >
@@ -261,11 +261,35 @@ ssthresh = max(FlightSize / 2, 2 * SMSS)
 
 除此之外，当下一个收到的消息段填充了全部或者部分消息编号的间隙时（译者注：说明中间被跳过的这一段数据并未完全丢失），TCP 接收端还**应该**(SHOULD) 立即发送一个ACK。此时，对正在准备使用超时“重传机制、快速重传机制或者高级丢失恢复算法”重发丢失消息段的发送端而言，这个 立即发送的 ACK 能够提供更多及时的信息，对此机制的概述见 4.3 节。
 
-TCP 发送端**应该**(SHOULD) 使用 “快速重传”算法根据到来的重复 ACK 检测并恢复丢失的消息段。快速重传算法使用 3 个重复 ACK 作为消息段丢失的标志（正如在第二节中的定义，这三个重复 ACK 之间不能夹杂有移动了 SND.UNA 的 ACK）。接收到三个重复 ACK 后，TCP  发送端会对看起来可能发生了丢失的消息进行重传，而不会等待重传计时器超时。
+TCP 发送端**应该**(SHOULD) 使用 “快速重传”算法根据到来的重复 ACK 检测并恢复丢失的消息段。快速重传算法使用 3 个重复 ACK 作为消息段丢失的标志（正如在第二节中的定义，这三个重复 ACK 均不会导致 SND.UNA 指针移动）。接收到三个重复 ACK 后，TCP  发送端会对看起来可能发生了丢失的消息进行重传，而不会等待重传计时器超时。
 
 > 译者注：上一段内容中括号中的翻译存疑，原文为：
 >
-> as defined in section 2, without any intervening ACKs which move SND.UNA
+> as defined in section 2, without any intervening ACKs which move SND.UNA 
+
+> 译者注：关于 SND.UNA
+>
+> 以下内容摘自：[The TCP/IP Guide - TCP Sliding Window Data Transfer and Acknowledgement Mechanics (tcpipguide.com)](http://www.tcpipguide.com/free/t_TCPSlidingWindowDataTransferandAcknowledgementMech-2.htm)
+>
+> **Send (SND) Pointers**
+>
+> Both the client and server in the connection must keep track of the stream it is transmitting and the one it is receiving from the other device. This is done using a set of special variables called *pointers*, that carve the byte stream into the categories above. The four transmit categories are divided using three pointers. Two of the pointers are absolute (refer to a specific sequence number) while one is an offset that is added to one of the absolute pointers, as follows (refer to [Figure 219](http://www.tcpipguide.com/free/t_TCPSlidingWindowDataTransferandAcknowledgementMech-2.htm#Figure_219)):
+>
+> - **Send Unacknowledged (SND.UNA):** The sequence number of the first byte of data that has been sent but not yet acknowledged. This marks the first byte of Transmit Category #2; all previous sequence numbers refer to bytes in Transmit Category #1.
+>
+>   
+>
+> - **Send Next (SND.NXT):** The sequence number of the next byte of data to be sent to the other device (the server in this case). This marks the first byte of Transmit Category #3.
+>
+>   
+>
+> - **Send Window (SND.WND):** The size of the send window. Recall that the window specifies the total number of bytes that any device may have “outstanding” (*unacknowledged*) at any one time. Thus, adding the sequence number of the first unacknowledged byte (*SND.UNA*) and the send window *(SND.WND*) marks the first byte of Transmit Category #4.
+>
+> ![img](http://www.tcpipguide.com/free/diagrams/tcpswpointers.png)
+>
+> **Figure 219: TCP Transmission Categories, Send Window and Pointers**
+>
+> This diagram is the same as [Figure 207](http://www.tcpipguide.com/free/t_TCPSlidingWindowAcknowledgmentSystemForDataTranspo-6.htm#Figure_207), but shows the TCP send pointers. *SND.UNA* points to the start of Transmit Category #2, *SND.NXT* points to the start of Transmit Category #3, and *SND.WND* is the size of the send window. The size of the usable window can be calculated as shown from those three pointers.
 
 <center>第 8 页</center>
 
