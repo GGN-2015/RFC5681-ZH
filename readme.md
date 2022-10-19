@@ -189,7 +189,7 @@ $ssthresh $的初始值**应该**(SHOULD) 尽可能定得高一些（例如将 s
 
 ---
 
-当 $cwnd<ssthresh$ 时，TCP 发送端采用慢启动算法；当 $cwnd>ssthresh$ 时 ，TCP 发送端采用拥塞避免算法。当 $cwnd=ssthresh$ 时，发送端既可以采用慢启动算法，也可以采用拥塞避免算法。
+当 $cwnd \lt ssthresh$ 时，TCP 发送端采用慢启动算法；当 $cwnd \gt ssthresh$ 时 ，TCP 发送端采用拥塞避免算法。当 $cwnd=ssthresh$ 时，发送端既可以采用慢启动算法，也可以采用拥塞避免算法。
 
 在慢启动的过程中，TCP 发送端每收到一个新的累积确认应答 ACK，它至多可以让 $cwnd$ 的取值增加 SMSS。当 $cwnd$ 的值超过 $ssthresh$ 或者拥塞已被检测到时，慢启动算法结束。尽管传统的 TCP 一般严格按照约定，每收到一个新的累积确认应答 ACK 时就将 $cwnd$ 的值增加 SMSS，但我们**建议**(RECOMMEND) 按照如下的方法调整 $cwnd$:
 
