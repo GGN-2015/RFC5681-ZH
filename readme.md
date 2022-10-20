@@ -298,14 +298,14 @@ TCP 发送端**应该**(SHOULD) 使用 “快速重传”算法根据到来的�
 快速重传和快速恢复算法的实现相互关联，具体实现如下文所述：
 
 1. 当第一个和第二个重复的 ACK 到来时，只要接收端发布的接受窗允许且“在传数据量” FlightSize 仍不超过 $cwnd+2\times SMSS$ 且新的数据段已经准备就绪，TCP 发送端就**应该**(SHOULD) 根据 [RFC3042] 的规定发送一个先前未被发送的数据段。具体而言，TCP 发送端**禁止**(MUST NOT) 根据这两个段改变 $cwnd$ 的取值 [RFC3042]。需要注意的是，对于那些使用了 SACK 技术 [RFC2018] 的发送端而言，它们**禁止**(MUST NOT) 发送新的数据，除非刚刚收到的重复确认中包含了新的 SACK 信息。
-2. 当第三个重复的 ACK 到来时，TCP 发送端**必须**(MUST) 将 $ssthresh$ 设置为不超过等式 (4) 中规定的值。如果当前通信使用了 [RFC3042] 中规定的技术，在受限制的传输中(in limited transmit) 发送的额外数据**不得**(MUST NOT) 被包含在等式 (4) 的计算中。
+2. 当第三个重复的 ACK 到来时，TCP 发送端**必须**(MUST) 将 $ssthresh$ 设置为不超过等式 (4) 中规定的值。如果当前通信使用了 [RFC3042] 中规定的技术，等式 (4) 的计算中在**不得**(MUST NOT) 包含受限传输中(in limited transmit) 发送的额外数据。
 3.  SND.UNA 指针指向位置开始的所有丢失消息段**必须**(MUST) 被重传，且 $cwnd$ 的值必须被设置为 $ssthresh + 3\times SMSS$。这个操作能根据离开网络并进入接受端的消息段个数（三个）人为地增大拥塞窗的大小。
 
 > 译者注：翻译存疑，原文为：
 >
 > This artificially "inflates" the congestion window by the number of segments (three) that have left the network and which the receiver has buffered.
 
-4. 当发送端接收到第三个重复 ACK 之后又接收到了其他的重复ACK，$cwnd$ **必须**(MUST) 以 SMSS 为单位进行扩大。这种人为扩大拥塞窗的行为旨在反应离开网络的额外的段。
+4. 当发送端接收到第三个重复 ACK 之后又接收到了其他的重复ACK，$cwnd$ **必须**(MUST) 以 SMSS 为单位进行扩大。这种人为扩大拥塞窗的行为旨在反应离开网络的额外的消息段。
 
 注：[SCWA99] 中讨论了一种基于接收端的攻击，这种攻击向数据发送端伪造重复的ACK应答消息，以人为地增加 $cwnd$ 的值，导致发送端的 $cwnd$ 过大。为了应对这种情况，TCP 发送端**可以**(MAY) 限制 $cwnd$ 在丢失恢复过程中被人为增加的次数不超过在传数据段总数(outstanding segments) （或者近似不超过再传数据段总数）。
 
