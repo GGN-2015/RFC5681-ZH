@@ -359,7 +359,64 @@ TCP 接收端**应该**(SHOULD) 使用[RFC1122] 中给出的延迟 ACK 算法(Th
 
 ---
 
+为了加速丢失恢复过程，乱序到来的数据段**应该**(SHOULD) 立刻确认。当收到序列号不连续的数据段时，接收端必须立刻发送一个重复 ACK 以触发快速重传算法。此后，当接收端接收到了弥补了部分或全部序列号间隙的乱序段时，接收端也**应该**(SHOULD) 立刻发送一个 ACK 以将消息反馈给发送端，让发送端从“丢失状态”中恢复。
+
+TCP 接收端**不得**(MUST NOT) 为每个到来的消息段生成超过一个 ACK，除非这个消息在提供新数据的同时还更新了发送窗大小（见 [RFC813] 以及 [RFC793] 42页）。
+
+### 4.3 丢失恢复机制
+
+RFC 系列文档中详细阐述了大量的 TCP 研究者建议使用的带有快速重传和快速恢复算法的丢失恢复算法。其中，一些算法基于 TCP 的选择性确认(SACK) 选项（见 [RFC2018]），例如 [FF96]，[MM96a]，[MM96b] 以及 [RFC3517]；另一些不需要使用选择确认选项，例如 [Hoe96]，[FF96] 以及 [RFC3782]。<u>不采用选择性确认(non-SACK) 的算法使用“部分确认”("partial acknowledgments") 机制触发重传（“部分确认”指涵盖了一些（而非全部）未确认数据的确认消息）。</u>尽管本文并不为某个具体的经过改进的快速重传/快速恢复算法做标准化，但只要这些算法遵循了上文中所概述的基本原则，就可以默认他们符合本文的要求。
+
+> 译者注：上文划线句子翻译存疑：原文为：
+>
+> The non-SACK algorithms use "partial acknowledgments" (ACKs that cover previously unacknowledged data, but not all the data outstanding when loss was detected) to trigger retransmissions. 
+
+首先，当第一个丢失在数据窗中被检测出来时，$ssthresh$ **必须**(MUST) 被设为一个不超过等式(4) 给出的值。其次，从检测到丢失起，直到数据窗中所有丢失段都被恢复为止，发送端每相邻 RRT 时间内发送的消息长度不得超过未确认数据总量的一半。最后，当给定窗口中所有丢失的段都已经被成功重传后，$cwnd$ 的值**必须**(MUST) 被设为一个不超过 $ssthresh$ 的值，同时**必须**（MUST）按照拥塞避免算法进一步扩增 $cwnd$。两个连续窗口中数据的丢失以及重传数据的丢失都能指示拥塞的发生，因此当这两种情况发生时我们要连续调低 $cwnd$ （以及 $ssthresh$） 两次。
+
+<center>第 12 页</center>
+
+---
+
+我们**建议**(RECOMMEND) TCP 的实现者采用一些能够应对同一窗口中多次数据丢失的高级丢失恢复算法。[RFC3782] 和 [RFC3517] 中给出的算法符合上述基本原则。请注意，尽管除了这两个算法外还有其他算法符合上述原则，但是这两个算法已经通过审查并被互联网社区规定为当前标准的一部分(currently on the Standards Track)。
+
+## 5. 安全问题
+
+当重传超时或者重复确认到来时，本文要求 TCP 设备立即减小它的发送速率。借此，攻击者可以故意让自己的数据段或确认消息丢失，也可以伪造大量的重复确认消息以降低 TCP 连接的性能。
+
+为了应对 [SCW99] 中提出的 “ACK 分片” 攻击，本文**建议**(RECOMMEND) 根据每次被确认的字节数增加拥塞窗，而不是每收到一个 ACK 就将拥塞窗增加一个定值 SMSS（详见 3.1 节）。
+
+因特网在很大程度上依赖于这些算法的正确实现以保证网络的稳定性并避免网络在拥塞中崩溃。攻击者可以以拥塞的名义伪造大量的重复确认消息或针对新数据的确认消息，从而使  TCP 末端更加“激进”(aggressively) 地回应这些消息。
+
+## 6. RFC 2581 相较于 RFC 2001 的改变
+
+相较于 [RFC2001]，[RFC2581] 做出了非常多地修改以至于我们很难逐条列出 [RFC2581] 对 [RFC2001] 到底做出了哪些修改。[RFC2581] 旨在不改变 [RFC2001] 中给出的建议内容的前提下，更加深入地阐明那些在 [RFC2001] 中未被具体讨论地细节。具体而言，[RFC2581] 中建议了 TCP 连接在经历了一段较长时间的空闲后应该如何恢复，以及详细地阐明了一些关于 TCP ACK 生成的问题。最后，[RFC2581] 将初始拥塞窗的可允许上界从 $1$ 个最大段长提升到了 $2$ 个最大段长。
+
+<center>第 13 页</center>
+
+---
+
+## 7. 本文相较于 RFC 2581 的改变
+
+
+
+<center>第 14 页</center>
+
+---
+
+## 8. 鸣谢
+
+我们所讨论的核心算法由 Van Jacobson 研发 [Jac88, Jac90]。另外，限制传输(Limit Transmit) [RFC3042] 由 Hari Balakrishnan 和 Sally Floyd 合作研发。本文对于初始拥塞窗大小的约定源于 Sally Floyd 和 Craig Partridge 的研究 [RFC2421, RFC3390]。
+
+W.Richard ("Rich") Stevens 编写了本文的第一个版本 [RFC2001] 并且参与了本文的第二个版本 [RFC2581] 的编写。当前版本主要得益于他清晰与深刻的阐述，我们非常感激 Rich 在阐明 TCP 拥塞控制面的贡献，以及他在网络方面关于无数问题上的广泛帮助。
+
+需要强调的是，本文中的缺点和错误仅由本文作者导致的，与引文内容无关。
+
+本文中的一部分文本来自 W.Richard Stevens（1995 年 Addison-Wesley 出版） 编写的 《TCP/IP Illustrated Volume 1: The Protocols》(译者注：《TCP/IP 详解 第一卷：协议》) 以及 Gary R. Wright 与 W. Richard Stevens  (1995 年 Addison- Wesley 出版)合作编写的 《TCP/IP Illustrated, Volume 2: The Implementation》(译者注：《TCP/IP 详解 第二卷：实现》) 。对于这些文本的使用征求了出版商 Addison- Wesley 的许可。
+
+Anil Agarwal，Steve Arden，Neal Cardwell，Noritoshi Demizu，Gorry Fairhurst，Kevin Fall，John Heffner，Alfred Hoenes，Sally Floyd，Reiner Lugwig，Matt Mathis，Craig Partridge 以及 Joe Touch 为本文提供了不少宝贵的意见。
+
 ## 9. 参考文献
+
 ### 9.1 规范性参考文献
 
 | 文档      | 作者.标准.时间                                               |
