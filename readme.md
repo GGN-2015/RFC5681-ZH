@@ -50,7 +50,7 @@ BCP 78 以及 IETF Trust 关于 IETF 文档的法律条款对本文的约束力�
 7. 本文相较于 RFC 2581 的改变
 8. 鸣谢
 9. 参考文献
-   1. 一般性参考文献
+   1. 规范性参考文献
    2. 信息性参考文献
 
 ## 1. 简介
@@ -351,7 +351,7 @@ TCP 接收端**应该**(SHOULD) 使用[RFC1122] 中给出的延迟 ACK 算法(Th
 >
 > Specifically, an ACK SHOULD be generated for at least every second full-sized segment, and MUST be generated within 500 ms of the arrival of the first unacknowledged packet.
 
-上文中所述针对全长段的 ACK “**应该**”("SHOULD") 应该做到至少每秒发送一个，这一要求在 [RFC1122] 的有些段落说是“**应该**”(SHOULD) 做的，另一些段落说是“**必须**”(MUST) 做的。为了消除歧义，我们称这种行为是“**应该**”(SHOULD) 做的。我们在此强调这种行为是“**应该**(SHOULD)” 做的，换言之，只有当 TCP 的实现者认真思考了违背这一约定的潜在后果时，才可以违背这一约定。关于“拖延 ACK 违例”(Stretch ACK violation) 的讨论详见 [RFC2525] 以及该文档的引用，其中讨论了针对全长段的 ACK 消息的发送频率如果低于每秒一次可能带来的性能问题。
+上文中所述针对全长段的 ACK “**应该**”("SHOULD") 应该做到至少每秒发送一个，这一要求在 [RFC1122] 的有些段落说是“**应该**”(SHOULD) 做的，另一些段落说是“**必须**”(MUST) 做的。为了消除歧义，我们明确地称这种行为是“**应该**”(SHOULD) 做的。我们在此强调这种行为是“**应该**(SHOULD)” 做的，换言之，只有当 TCP 的实现者认真思考了违背这一约定的潜在后果时，才可以违背这一约定。关于“拖延 ACK 违例”(Stretch ACK violation) 的讨论详见 [RFC2525] 以及该文档的引用，其中讨论了针对全长段的 ACK 消息的发送频率如果低于每秒一次可能带来的性能问题。
 
 在某些情况下，发送端和接收端在全长段的长度问题上可能并未达成一致。如果接收端至少能做到每收到 $2\times RMSS$ 个字节的消息就发送一个 ACK，我们认为仍是符合上述要求的，其中 RMSS 指接收端向发送端声明的最大段长度（如果接收者没有具体地给出 MSS，根据 [RFC1122] 中的约定，RMSS 的默认值为 $536$ 字节 ）。由于最大传输单元(MTU) 的闲置，发送端可能不得不使用小于 RMSS 的值为长度单位发送数据，受制于路径 MTU 发现算法和其他因素。举例来说，考虑接收端发布的 $RMSS$ 等于 $X$ 字节，但发送端由于 MTU 发现算法（或发送端自身的 MTU 大小限制）最终采用的段长为 $Y$ 字节 ($Y \lt X$) 的情况。如果接收者等待到至少有 $2\times X$ 个字节的数据到来后才发送 ACK，我们称这种 ACK 叫 “拖延 ACK”。显然这个过程至少需要 $3$ 个长度为 $Y$ 的消息段接收端才能发送一个 ACK。因此，如果并没有具体的算法定义如何处置这种情况，接收者最好努力避免这种情况的发生，例如，可以要求接收者无论接收到多少字节的数据每秒应至少发送一个 ACK。最后我们重申，在等待下一个全长段到来之前，ACK 的发送**不得**(MUST NOT) 延迟超过 $500ms$。
 
@@ -359,7 +359,38 @@ TCP 接收端**应该**(SHOULD) 使用[RFC1122] 中给出的延迟 ACK 算法(Th
 
 ---
 
+## 9. 参考文献
+### 9.1 规范性参考文献
 
+| 文档      | 作者.标准.时间                                               |
+| --------- | ------------------------------------------------------------ |
+| [RFC793]  | Postel, J., "Transmission Control Protocol", STD 7, RFC 793, September 1981. |
+| [RFC1122] | Braden, R., Ed., "Requirements for Internet Hosts Communication Layers", STD 3, RFC 1122, October 1989. |
+| [RFC1191] | Mogul, J. and S. Deering, "Path MTU discovery", RFC 1191, November 1990. |
+| [RFC2119] | Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, March 1997. |
+
+<center>第 15 页</center>
+
+---
+
+### 9.2 信息性参考文献
+
+| 文档      | 作者.标准.时间                                               |
+| --------- | ------------------------------------------------------------ |
+| [CJ89]    | Chiu, D. and R. Jain, "Analysis of the Increase/Decrease Algorithms for Congestion Avoidance in Computer Networks", Journal of Computer Networks and ISDN Systems, vol. 17, no. 1, pp. 1-14, June 1989. |
+| [FF96]    | Fall, K. and S. Floyd, "Simulation-based Comparisons of Tahoe, Reno and SACK TCP", Computer Communication Review, July 1996, ftp://ftp.ee.lbl.gov/papers/sacks.ps.Z. |
+| [Hoe96]   | Hoe, J., "Improving the Start-up Behavior of a Congestion Control Scheme for TCP", In ACM SIGCOMM, August 1996. |
+| [HTH98]   | Hughes, A., Touch, J., and J. Heidemann, "Issues in TCP Slow-Start Restart After Idle", Work in Progress, March 1998. |
+| [Jac88]   | Jacobson, V., "Congestion Avoidance and Control", Computer Communication Review, vol. 18, no. 4, pp. 314-329, Aug. 1988. ftp://ftp.ee.lbl.gov/papers/congavoid.ps.Z. |
+| [Jac90]   | Jacobson, V., "Modified TCP Congestion Avoidance Algorithm", end2end-interest mailing list, April 30, 1990. ftp://ftp.isi.edu/end2end/end2end-interest-1990.mail. |
+| [MM96a]   | Mathis, M. and J. Mahdavi, "Forward Acknowledgment: Refining TCP Congestion Control", Proceedings of SIGCOMM’96, August, 1996, Stanford, CA. Available from http://www.psc.edu/networking/papers/papers.html |
+| [MM96b]   | Mathis, M. and J. Mahdavi, "TCP Rate-Halving with Bounding Parameters", Technical report. Available from http://www.psc.edu/networking/papers/FACKnotes/current. |
+| [Pax97]   | Paxson, V., "End-to-End Internet Packet Dynamics", Proceedings of SIGCOMM ’97, Cannes, France, Sep. 1997. |
+| [RFC813]  | Clark, D., "Window and Acknowledgement Strategy in TCP", RFC 813, July 1982. |
+| [RFC2001] | Stevens, W., "TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery Algorithms", RFC 2001, January 1997. |
+| [RFC2018] | Mathis, M., Mahdavi, J., Floyd, S., and A. Romanow, "TCP Selective Acknowledgment Options", RFC 2018, October 1996. |
+
+[第 16 页]
 
 #  未完待续 ...
 
