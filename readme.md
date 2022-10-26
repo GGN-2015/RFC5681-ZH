@@ -471,9 +471,9 @@ Anil Agarwal，Steve Arden，Neal Cardwell，Noritoshi Demizu，Gorry Fairhurst�
 | [RFC2001] | Stevens, W., "TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery Algorithms", RFC 2001, January 1997. |
 | [RFC2018] | Mathis, M., Mahdavi, J., Floyd, S., and A. Romanow, "TCP Selective Acknowledgment Options", RFC 2018, October 1996. |
 
-[第 16 页]
+<center>第 16 页</center>
 
-
+---
 
 续表。
 
@@ -494,6 +494,10 @@ Anil Agarwal，Steve Arden，Neal Cardwell，Noritoshi Demizu，Gorry Fairhurst�
 | [SCWA99]  | Savage, S., Cardwell, N., Wetherall, D., and T. Anderson, "TCP Congestion Control With a Misbehaving Receiver", ACM Computer Communication Review, 29(5), October 1999. |
 | [Ste94]   | Stevens, W., "TCP/IP Illustrated, Volume 1: The Protocols", Addison-Wesley, 1994. |
 | [WS95]    | Wright, G. and W. Stevens, "TCP/IP Illustrated, Volume 2: The Implementation", Addison-Wesley, 1995. |
+
+<center>第 17 页</center>
+
+----
 
 本文作者的联系方式：
 
