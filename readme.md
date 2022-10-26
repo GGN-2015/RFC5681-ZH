@@ -397,7 +397,31 @@ RFC 系列文档中详细阐述了大量的 TCP 研究者建议使用的带有�
 
 ## 7. 本文相较于 RFC 2581 的改变
 
+基于 BSD 版 TCP 实现，本文中增加了关于“重复确认”的具体定义。
 
+在重传计时器超时后，如果接收到了重复的 ACK 发送端应该如何处理，本文并不关注。
+
+[RFC3390] 中所允许的初始窗大小比先前标准更大，为了迎合这一新标准，本文修改了对初始窗大小的限制。另外，当初始窗过大、不符合路径 MTU 发现 算法（见 [RFC1191]）给出的 MTU 值的限制时，本文也给出了具体的处理得步骤。
+
+早期的协议中建议，我们**可以**(MAY) 将 $ssthresh$ 的值设为为任意一个较高的值，而在本文中我们将**可以**(MAY) 修改为了**应该**(SHOULD)。换言之，这为 TCP 中的相关实现提供了更强的约束。
+
+> 译者注：原文为：
+>
+> This is to provide additional guidance to implementors on the matter.
+
+在慢启动过程中，我们明确地建议采用恰当字节计数(Appropriate Byte Counting [RFC3465]) 算法，并建议设 $L=1\times SMSS$。但我们也允许实现者按照 [RFC2581] 中给出的算法来增加 $cwnd$ 的值。在拥塞避免的过程中，尽管我们允许 TCP 设备使用 [RFC2581] 中给出的算法以及其他安全的算法，但我们建议采用字节计数(Byte counting)。
+
+本文规定了在重传超时时应该如何修改 $ssthressh$ 的值。具体而言，在某段内容第一次重传时，我们要将 $ssthresh$ 设为 $FlightSize$ 的一半，第二次重传以及后续的重传发生时，$ssthresh$ 的值保持不变。
+
+本文描述了快速重传和快速恢复算法，并且建议采用 [RFC3042] 中给出的限制传输算法(Limited Transmit)。
+
+按照本文的要求，TCP 设备**可以**(MAY) 根据正在传输且尚未确认的数据量(outstanding data)对能够使得 $cwnd$ 人为增加的重复 ACK 的数量进行限制，从而避免 [SCWA99] 中描述的重复 ACK 伪造攻击(duplicate ACK spoofing)。
+
+本文将重启窗 $RW$ 的值定义为 $\min(IW, cwnd)$，而原先的标准规定 $RW=IW$。在 [RFC2581] 中，将 $RW$ 设为  $\min(IW, cwnd)$ 被视为一种“实验性”的举措，本文将其设为标准做法。
+
+虽然本文并没有给出一种具体的丢失恢复算法，但本文给出了丢失恢复算法在实现上的约束与框架。本文建议 TCP 实现者自行实现一种符合本文框架的高级丢失恢复算法。
+
+在安全问题方面，本文中新增了关于 “ACK 分片攻击”(ACK division attack) 的讨论，并建议采用字节计数方法以应对这种攻击。
 
 <center>第 14 页</center>
 
@@ -449,6 +473,52 @@ Anil Agarwal，Steve Arden，Neal Cardwell，Noritoshi Demizu，Gorry Fairhurst�
 
 [第 16 页]
 
-#  未完待续 ...
 
-2022-10-19 
+
+续表。
+
+| 文档      | 作者.标准.时间                                               |
+| --------- | ------------------------------------------------------------ |
+| [RFC2414] | Allman, M., Floyd, S., and C. Partridge, "Increasing TCP’s Initial Window", RFC 2414, September 1998. |
+| [RFC2525] | Paxson, V., Allman, M., Dawson, S., Fenner, W., Griner, J., Heavens, I., Lahey, K., Semke, J., and B. Volz, "Known TCP Implementation Problems", RFC 2525, March 1999. |
+| [RFC2581] | Allman, M., Paxson, V., and W. Stevens, "TCP Congestion Control", RFC 2581, April 1999. |
+| [RFC2883] | Floyd, S., Mahdavi, J., Mathis, M., and M. Podolsky, "An Extension to the Selective Acknowledgement (SACK) Option for TCP", RFC 2883, July 2000. |
+| [RFC2988] | Paxson, V. and M. Allman, "Computing TCP’s Retransmission Timer", RFC 2988, November 2000. |
+| [RFC3042] | Allman, M., Balakrishnan, H., and S. Floyd, "Enhancing TCP’s Loss Recovery Using Limited Transmit", RFC 3042, January 2001. |
+| [RFC3168] | Ramakrishnan, K., Floyd, S., and D. Black, "The Addition of Explicit Congestion Notification (ECN) to IP", RFC 3168, September 2001. |
+| [RFC3390] | Allman, M., Floyd, S., and C. Partridge, "Increasing TCP’s Initial Window", RFC 3390, October 2002. |
+| [RFC3465] | Allman, M., "TCP Congestion Control with Appropriate Byte Counting (ABC)", RFC 3465, February 2003. |
+| [RFC3517] | Blanton, E., Allman, M., Fall, K., and L. Wang, "A Conservative Selective Acknowledgment (SACK)-based Loss Recovery Algorithm for TCP", RFC 3517, April 2003. |
+| [RFC3782] | Floyd, S., Henderson, T., and A. Gurtov, "The NewReno Modification to TCP’s Fast Recovery Algorithm", RFC 3782, April 2004. |
+| [RFC4821] | Mathis, M. and J. Heffner, "Packetization Layer Path MTU Discovery", RFC 4821, March 2007. |
+| [SCWA99]  | Savage, S., Cardwell, N., Wetherall, D., and T. Anderson, "TCP Congestion Control With a Misbehaving Receiver", ACM Computer Communication Review, 29(5), October 1999. |
+| [Ste94]   | Stevens, W., "TCP/IP Illustrated, Volume 1: The Protocols", Addison-Wesley, 1994. |
+| [WS95]    | Wright, G. and W. Stevens, "TCP/IP Illustrated, Volume 2: The Implementation", Addison-Wesley, 1995. |
+
+本文作者的联系方式：
+
+​	**Mark Allman**
+​	International Computer Science Institute (ICSI)
+​	1947 Center Street
+​	Suite 600
+​	Berkeley, CA 94704-1198
+​	Phone: +1 440 235 1792
+​	EMail: mallman@icir.org
+​	http://www.icir.org/mallman/
+
+​	**Vern Paxson**
+​	International Computer Science Institute (ICSI)
+​	1947 Center Street
+​	Suite 600
+​	Berkeley, CA 94704-1198
+​	Phone: +1 510/642-4274 x302
+​	EMail: vern@icir.org
+​	http://www.icir.org/vern/
+
+​	**Ethan Blanton**
+​	Purdue University Computer Sciences
+​	305 North University Street
+​	West Lafayette, IN 47907
+​	EMail: eblanton@cs.purdue.edu
+​	http://www.cs.purdue.edu/homes/eblanton/
+
