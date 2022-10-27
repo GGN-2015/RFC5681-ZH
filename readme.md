@@ -79,7 +79,7 @@ BCP 78 以及 IETF Trust 关于 IETF 文档的法律条款对本文的约束力�
 
 ## 2. 定义
 
-本节定义了在本文其余部分使用到的术语。
+本节定义了其他节中使用到的术语。
 
 **消息段**(SEGMENT)： TCP/IP 数据和确认包(acknowledge packet) 统称为消息段。
 
